@@ -19,7 +19,9 @@ class ProductController extends Controller
 
   public function show($id)
   {
-    return Product::find($id);
+    $product = Product::find($id);
+    $thumb = $product->getFirstMediaUrl('product-thumbnails', 'thumb');
+    return response(['data' => $product, 'thumbnail' => $thumb ]);
   }
 
   public function store(Request $request)
@@ -30,16 +32,6 @@ class ProductController extends Controller
           'product_title' => 'required',
           'date_arrived' => 'required',
           'expiry_date' => 'required',
-          // 'description' => 'required|max:255',
-          // 'specs' => 'sometimes|max:500',
-          // 'memo' => 'sometimes|max:255',
-          // 'pcs_per_carton' => 'required',
-          // 'weight' => 'required',
-          // 'qty' => 'sometimes',
-          // 'type_id' => 'sometimes|required',
-          // 'brand_id' => 'sometimes|required',
-          // 'category_id' => 'sometimes|required',
-          // 'profile' => 'sometimes|required'
       ]);
 
       $product = Product::create($request->all());
@@ -73,5 +65,27 @@ class ProductController extends Controller
      } catch (Exception $e) {
       return response(['message' => 'Something went wrong.']);
      }
+  }
+
+  public function singleImage (Request $request)
+  {
+      $singleProduct = Product::find($request->product_id);
+
+      try {
+          if ($request->hasFile('thumbnail') && $request->file('thumbnail')->isValid()) {
+              $upload = $singleProduct->addMediaFromRequest('thumbnail')->toMediaCollection('product-thumbnails');
+              return response([ 'message' => $upload, 'product' => $singleProduct]);
+
+          } else {
+              return response([ 'message' => 'wala' ]);
+          }
+          // if($request->hasFile('thumbnail') && $request->file('thumbnail')->isValid()){
+          //     $upload = $product->addMediaFromRequest('thumbnail')->toMediaCollection('product-thumbnails');
+          //     dd($upload);
+          // }
+      } catch (\Exception $e) {
+          //throw $th;
+          return $e->getMessage();
+      }
   }
 }

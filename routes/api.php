@@ -39,3 +39,5 @@ Route::get('/category', 'Api\CategoryController@index');
 Route::get('/type', 'Api\TypeController@index');
 
 Route::delete('/product', 'Api\ProductController@deleteMany');
+
+Route::post('/thumbnail', 'Api\ProductController@singleImage');
