@@ -5,11 +5,13 @@ namespace App\Http\Controllers\Api;
 use App\Product;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ProductMedia;
 
 class ProductController extends Controller
 {
   public function index()
   {
+    // $products = Product::all();
     return datatables()->of(Product::all())
         ->addColumn('action', 'action_button')
         ->rawColumns(['action'])
@@ -17,11 +19,24 @@ class ProductController extends Controller
         ->make(true);
   }
 
+  // function getImageData($model)
+  // {
+  //   $mediaItems = $model->getMedia('product-thumbnails');
+  //   $count = count($mediaItems) -1;
+  //   return  $mediaItems[$count]->getUrl('square');
+  // }
+
   public function show($id)
   {
     $product = Product::find($id);
-    $thumb = $product->getFirstMediaUrl('product-thumbnails', 'thumb');
-    return response(['data' => $product, 'thumbnail' => $thumb ]);
+    $mediaItems = $product->getMedia('product-thumbnails');
+    $count = count($mediaItems) -1;
+    // $thumb = $mediaItems[0]->getUrl('square');
+    // $x = array_slice($mediaItems, -1)[0];
+    // $thumb = $mediaItems[0]->getUrl('square');
+    $thumb = $mediaItems[$count]->getUrl('square');
+    // $thumb = $product->getFirstMediaUrl('product-thumbnails', 'square');
+    return response(['data' => $product, 'thumbnail' => $thumb]);
   }
 
   public function store(Request $request)
@@ -71,10 +86,20 @@ class ProductController extends Controller
   {
       $singleProduct = Product::find($request->product_id);
 
+
       try {
           if ($request->hasFile('thumbnail') && $request->file('thumbnail')->isValid()) {
               $upload = $singleProduct->addMediaFromRequest('thumbnail')->toMediaCollection('product-thumbnails');
-              return response([ 'message' => $upload, 'product' => $singleProduct]);
+
+              // find the image
+              $mediaItems = $singleProduct->getMedia('product-thumbnails');
+              $count = count($mediaItems) -1;
+              $thumb = $mediaItems[$count]->getUrl('square');
+
+              $singleProduct->profile = $thumb;
+              $singleProduct->save();
+
+              return response([ 'message' => $upload, 'product' => $singleProduct, 'thumb' => $thumb]);
 
           } else {
               return response([ 'message' => 'wala' ]);
