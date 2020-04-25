@@ -38,6 +38,16 @@ Route::get('/brand', 'Api\BrandController@index');
 Route::get('/category', 'Api\CategoryController@index');
 Route::get('/type', 'Api\TypeController@index');
 
+Route::get('/media/{id}', 'Api\ProductController@getMedia');
+
+Route::get('/download-media/{id}', 'Api\ProductController@downloadMedia');
+
+Route::post('/media_delete', 'Api\ProductController@deleteMedia');
+
+
 Route::delete('/product', 'Api\ProductController@deleteMany');
 
 Route::post('/thumbnail', 'Api\ProductController@singleImage');
+Route::post('/multiple_image', 'Api\ProductController@multipleImage');
+
+Route::post('/single-upload', 'Api\ProductController@singleUpload');

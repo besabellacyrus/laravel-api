@@ -20,9 +20,25 @@ class Product extends Model implements HasMedia
               ->sharpen(10);
 
         $this->addMediaConversion('square')
-              ->width(412)
-              ->height(412)
+              ->width(480)
+              ->height(480)
               ->sharpen(10);
+    }
+
+    public function registerMediaCollections()
+    {
+        $this
+            ->addMediaCollection('product-banner')
+            ->singleFile();
+
+        $this
+            ->addMediaCollection('product-thumbnail')
+            ->singleFile();
+
+        $this
+            ->addMediaCollection('product-display')
+            ->singleFile();
+
     }
 
     public function brand()
